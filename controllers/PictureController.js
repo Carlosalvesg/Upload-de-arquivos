@@ -34,7 +34,7 @@ exports.findAll = async (req, res) => {
     // Busca todas img armazenadas no DB
     const pictures = await Picture.find();
     // Retorno todas img encontradas em formato de JSON
-    res.json(pictures);
+    res.json({ pictures, msg: "Imagens carregadas com sucesso!" });
   } catch (err) {
     // Caso haja erro durante a busca, retorna mensagem ao usuário
     res.status(500).json({ message: "Erro ao buscar as imagens." });
