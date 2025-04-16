@@ -76,22 +76,45 @@ function renderPhotoGrid(photos) {
 // Criar o elemento HTML de um card de Foto (Recebe objeto de foto)
 function createPhotoCardElement(photo) {
   const card = document.createElement("div");
-  card.className = "photo-card"; // Aplica a classe CSS para estilos
+  card.className = "photo-card";
 
-  // Monta URL para a imagem (API + ID da foto + /image)
   const imageUrl = `${config.apiUrl}/${photo._id}/image`;
 
-  // Define o HTML interno do card (Imagem e informação)
   card.innerHTML = `
-         <img src="${imageUrl}" alt="${photo.name}"
-              onerror="this.onerror=null; this.src='${config.placeholderImage}'">
-         <div class="photo-info">
-             <div class="photo-name">${photo.name}</div>
-         </div>
-         `;
+    <img src="${imageUrl}" alt="${photo.name}"
+         onerror="this.onerror=null; this.src='${config.placeholderImage}'">
+    <div class="photo-info">
+        <div class="photo-name">${photo.name}</div>
+        <button class="btn-delete" data-id="${photo._id}">Excluir</button>
+    </div>
+  `;
+
+  // Adiciona evento de click no botão de exclusão
+  const deleteBtn = card.querySelector(".btn-delete");
+  deleteBtn.addEventListener("click", async () => {
+    const confirmed = confirm("Tem certeza que deseja excluir esta imagem?");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`${config.apiUrl}/${photo._id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao excluir a imagem");
+      }
+
+      showNotification("Imagem excluída com sucesso!");
+      loadAndDisplayPhotos();
+    } catch (err) {
+      console.error("Erro ao excluir imagem:", err);
+      showNotification("Erro ao excluir imagem", "error");
+    }
+  });
 
   return card;
 }
+
 
 // Envia nova foto para o servidor (Recebe FormDAta com nome e arquivo)
 async function uploadNewPhoto(formData) {
